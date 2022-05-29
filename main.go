@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -21,7 +22,7 @@ var rnd *renderer.Render
 var db *mgo.Database
 
 const (
-	hostname       string = "localhost:22017"
+	hostname       string = "127.0.0.1:27017"
 	dbName         string = "demo_todo"
 	collectionName string = "todo"
 	port           string = ":9000"
@@ -45,6 +46,9 @@ type (
 func init() {
 	rnd = renderer.New()
 	sess, err := mgo.Dial(hostname)
+	if err != nil {
+		fmt.Println("cannot connect db: ", err)
+	}
 	checkErr(err)
 	sess.SetMode(mgo.Monotonic, true)
 	db = sess.DB(dbName)
@@ -52,6 +56,9 @@ func init() {
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	err := rnd.Template(w, http.StatusOK, []string{"static/home.tpl"}, nil)
+	if err != nil {
+		fmt.Println("cannot start port: ", err)
+	}
 	checkErr(err)
 }
 
